@@ -1,0 +1,4 @@
+JDBC real: Oracle 23; esquema BOMERP
+Dos formulas comparten MAIZ-01 en Oracle: OK
+Clave foranea FORMULA_DETALLE -> ARTICULO habilitada: OK
+Restriccion unica formula/articulo habilitada: OK

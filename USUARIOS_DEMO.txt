@@ -1,0 +1,42 @@
+LOGÍSTICA DE MAÍZ - USUARIOS Y CONTRASEÑAS DE DEMOSTRACIÓN (solo entorno local)
+==============================================================================
+
+1) USUARIOS DEL SISTEMA (entran por http://localhost:4200 -> "Acceso del personal")
+   Realm de Keycloak: maiz-erp
+
+   Usuario      Contraseña   Rol               Qué puede usar
+   ----------   ----------   ---------------   ------------------------------------------
+   admin        Demo2026!    ADMIN             Todos los módulos, incluida Administración
+   compras      Demo2026!    COMPRADOR         Compras y Personas
+   almacen      Demo2026!    ALMACENERO        Inventario (recepciones, lotes, despachos) y Artículos
+   produccion   Demo2026!    OPERARIO_PLANTA   Producción y reportes de producción
+   ventas       Demo2026!    VENDEDOR          Ventas (cotizaciones, pedidos, venta rápida) y Personas
+
+   Nota: los módulos de cada rol se pueden cambiar en Administración -> Permisos por rol.
+   ADMIN siempre tiene acceso completo.
+
+
+2) CONSOLA DE ADMINISTRACIÓN DE KEYCLOAK
+   Dirección:   http://localhost:8180
+   Usuario:     admin
+   Contraseña:  keycloak_local_2026
+   (Es una cuenta distinta del usuario "admin" del sistema.)
+
+
+3) BASE DE DATOS ORACLE (Docker)
+   Host / puerto:  localhost:1522
+   Servicio:       FREEPDB1
+
+   Usuario de la aplicación:   bomerp  /  bomerp_local_2026
+   Administrador:              system  /  oracle_local_2026
+
+
+4) DATOS DE DEMOSTRACIÓN (perfil "demo" del backend)
+   Proveedor:  PROVEEDOR de demostración  (RUC 20999999991)
+   Cliente:    CLIENTE de demostración    (RUC 20999999992)
+   Artículos:  MAIZ-01 Maíz amarillo, SOYA-01 Harina de soya, PUR-001 Purina de engorde
+   Almacenes:  Materias primas, Productos terminados, Almacén general
+
+
+IMPORTANTE: son credenciales de prueba para la computadora local. No las uses en un
+servidor público ni en la nube; ahí hay que cambiarlas todas.

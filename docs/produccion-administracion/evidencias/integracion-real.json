@@ -1,0 +1,53 @@
+{
+  "events": [
+    "Backend health UP. Configuración activa: JDBC Oracle FREEPDB1.",
+    "Keycloak admin: login PKCE y permisos API correctos",
+    "Keycloak produccion: login PKCE y permisos API correctos",
+    "Keycloak compras: login PKCE y permisos API correctos",
+    "Keycloak almacen: login PKCE y permisos API correctos",
+    "Keycloak ventas: login PKCE y permisos API correctos",
+    "Revocación real en Oracle: API 403 y menú vacío; permisos originales restaurados",
+    "Rol-permiso muchos a muchos: dos roles comparten permiso; rol temporal eliminado sin borrar permisos",
+    "CRUD institucional Oracle: altas, ediciones, dependencia bloqueada y bajas verificadas; datos temporales retirados",
+    "Dos fórmulas reales persisten los mismos insumos con cantidades independientes",
+    "Producción Oracle: espera, compra, recepción, consumo 6/4, rechazo de exceso y cierre incompleto, terminado 9 y merma 1, cierre único y reporte correctos",
+    "Cancelación y bloqueo de reinicio: correctos",
+    "Esperando expiración real y tolerancia de reloj del backend: 182 segundos",
+    "Keycloak real: token vencido rechazado 401; refresh token renovado; API 200 con el nuevo token"
+  ],
+  "formulaIds": [
+    2,
+    3
+  ],
+  "orderId": 1,
+  "cancelledOrderId": 2,
+  "originId": 4,
+  "destinationId": 5,
+  "purchaseId": 1,
+  "receiptId": 1,
+  "report": {
+    "id": 1,
+    "formula": "QA 60-40 1104191451",
+    "estado": "CERRADA",
+    "planificado": 10,
+    "producido": 9,
+    "insumos": [
+      {
+        "unidad": "KG",
+        "articulo": "MAIZ-01",
+        "real": 6,
+        "desviacion": 0.0,
+        "planificado": 6.0
+      },
+      {
+        "unidad": "KG",
+        "articulo": "SOYA-01",
+        "real": 4,
+        "desviacion": 0.0,
+        "planificado": 4.0
+      }
+    ]
+  },
+  "tag": "1104191451",
+  "refreshVerified": true
+}

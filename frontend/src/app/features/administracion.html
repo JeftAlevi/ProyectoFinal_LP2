@@ -1,0 +1,30 @@
+<span class="eyebrow">ORGANIZACIÓN Y ACCESO</span>
+<h1>Administración institucional</h1>
+<p>1. Registra la empresa y sus sedes. 2. Define los módulos de cada rol. 3. Vincula los perfiles del personal.</p>
+<div class="tabs">@for(l of links; track l){<a [routerLink]="['/catalogos',l]">{{l}}</a>}<a routerLink="/personas">Personas</a></div>
+@if(error()){<p class="alert error" role="alert">{{error()}}</p>}
+@if(estado()){<p class="alert success" role="status">{{estado()}}</p>}
+<section class="card">
+  <h2>Permisos por rol</h2>
+  <p>Selecciona un rol, marca sus módulos y guarda. Un rol puede tener varios permisos y un permiso puede estar en varios roles.</p>
+  <p>El nombre del rol debe coincidir exactamente con el configurado en Keycloak. Crear un rol aquí no crea una cuenta en Keycloak.</p>
+  <label>Rol<select [(ngModel)]="rolId" (ngModelChange)="cambiar()" [disabled]="ocupado()"><option [ngValue]="0">Seleccionar</option>@for(r of roles();track r.id){<option [ngValue]="r.id">{{r.nombre}}</option>}</select></label>
+  @if(esAdmin()){<p class="alert success">ADMIN tiene acceso completo fijo. Para limitar el acceso, configura los demás roles.</p>}
+  <div class="checks">@for(p of permisos();track p.id){<label><input type="checkbox" [disabled]="bloqueado(p)" [checked]="seleccion.includes(p.id)" (change)="check(p)">{{p.modulo}}</label>}</div>
+  <p>Administración está reservada a ADMIN.</p>
+  <button class="primary" [disabled]="!rolId || esAdmin() || ocupado()" (click)="guardar()">{{ocupado() ? 'Guardando…' : 'Guardar permisos'}}</button>
+  <details><summary>Ver qué roles utilizan cada permiso</summary><table><thead><tr><th>Permiso</th><th>Roles con acceso</th></tr></thead><tbody>@for(p of permisos();track p.id){<tr><td>{{p.modulo}}</td><td>{{rolesDelPermiso(p.id)}}</td></tr>}</tbody></table></details>
+</section>
+<section class="card">
+  <h2>Vincular perfil institucional</h2>
+  <p>Primero crea la cuenta y asigna su rol en Keycloak. Aquí solo registras a qué persona corresponde. La vinculación no modifica sus credenciales ni sus roles de acceso.</p>
+  <form #perfilForm="ngForm" class="form-grid" (ngSubmit)="crearUsuario(perfilForm)">
+    <label>Persona<select name="persona" [(ngModel)]="usuario.personaId" required><option [ngValue]="0">Seleccionar persona</option>@for(p of personas();track p.id){<option [ngValue]="p.id">{{p.nombreORazonSocial}}</option>}</select></label>
+    <label>Rol institucional<select name="rol" [(ngModel)]="usuario.rolId" required><option [ngValue]="0">Seleccionar rol</option>@for(r of roles();track r.id){<option [ngValue]="r.id">{{r.nombre}}</option>}</select></label>
+    <label>Usuario Keycloak<input name="username" [(ngModel)]="usuario.username" maxlength="60" required></label>
+    <label>ID de usuario Keycloak (sub)<input name="sub" [(ngModel)]="usuario.keycloakSub" required></label>
+    <button class="primary" [disabled]="ocupado() || !usuario.personaId || !usuario.rolId || perfilForm.invalid">Vincular perfil</button>
+  </form>
+  <h3>Perfiles registrados</h3>
+  @for(u of usuarios();track u.id){<p>{{u.username}} · {{u.persona}} · {{u.rol}}</p>}@empty{<p>Aún no hay perfiles vinculados.</p>}
+</section>

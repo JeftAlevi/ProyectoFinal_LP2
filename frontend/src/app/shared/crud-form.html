@@ -1,0 +1,39 @@
+<a [routerLink]="['/catalogos', tipo]">← Volver al listado</a>
+<h1>{{ id ? "Editar" : "Crear" }} · {{ config.title }}</h1>
+@if (error()) {
+  <p class="alert error" role="alert">{{ error() }}</p>
+}
+<form class="card form-grid" [formGroup]="form" (ngSubmit)="guardar()">
+  @for (c of config.fields; track c.key) {
+    <label
+      >{{ c.label }}
+      @if (c.options || c.source) {
+        <select [formControlName]="c.key">
+          <option [ngValue]="null">Seleccionar…</option>
+          @for (v of c.options || []; track v) {
+            <option [value]="v">{{ v }}</option>
+          }
+          @for (v of opciones()[c.key] || []; track v.id) {
+            <option [ngValue]="v.id">{{ v[c.display || "nombre"] }}</option>
+          }
+        </select>
+      } @else {
+        <input
+          [type]="c.type || 'text'"
+          [formControlName]="c.key"
+          [attr.min]="c.type === 'number' ? 0 : null"
+          step="0.0001"
+        />
+      }
+      @if (form.get(c.key)?.touched && form.get(c.key)?.invalid) {
+        <small class="error-text">Completa este campo correctamente.</small>
+      }
+    </label>
+  }
+  <div class="full actions">
+    <a [routerLink]="['/catalogos', tipo]">Cancelar</a
+    ><button class="primary" [disabled]="ocupado()">
+      {{ ocupado() ? "Guardando…" : "Guardar registro" }}
+    </button>
+  </div>
+</form>

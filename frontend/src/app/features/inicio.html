@@ -1,0 +1,47 @@
+<span class="eyebrow">OPERACIONES CONECTADAS</span>
+<h1>Tu operación, de principio a fin.</h1>
+<p class="lead">
+  Gestiona el abastecimiento, la transformación del maíz y la entrega de tus productos desde un
+  mismo lugar.
+</p>
+@if (indicadores().length) {
+  <div class="stats panel-stats" aria-label="Pendientes de hoy">
+    @for (i of indicadores(); track i.titulo) {
+      <a [routerLink]="i.ruta" [queryParams]="i.query">
+        <article>
+          <span>{{ i.titulo }}</span>
+          <strong>
+            @if (i.valor === null) {
+              —
+            } @else if (i.moneda) {
+              {{ i.valor | currency: 'PEN' : 'S/ ' }}
+            } @else {
+              {{ i.valor }}
+            }
+          </strong>
+          <small>{{ i.detalle }}</small>
+        </article>
+      </a>
+    }
+  </div>
+}
+<div class="module-grid">
+  @for (n of links; track n.path) {
+    @if (auth.puede(n.m)) {
+      <a class="module-card" [routerLink]="n.path"
+        ><span class="eyebrow">{{ n.n }}</span>
+        <h2>{{ n.title }}</h2>
+        <p>{{ n.desc }}</p>
+        <strong>Abrir módulo →</strong></a
+      >
+    }
+  }
+</div>
+<div class="card">
+  <h2>Flujo de trabajo</h2>
+  <p>Compra → recepción y calidad → existencias por lote → producción → pedido y despacho.</p>
+  <p class="muted">
+    Los artículos y las personas se comparten entre módulos. Las cantidades cambian cuando se
+    confirma una operación real.
+  </p>
+</div>

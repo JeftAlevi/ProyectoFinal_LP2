@@ -1,0 +1,19 @@
+-------------------------------------------------------------------------------
+Test set: pe.edu.upeu.bomerp.IntegracionTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 39.80 s <<< FAILURE! -- in pe.edu.upeu.bomerp.IntegracionTest
+pe.edu.upeu.bomerp.IntegracionTest.compraProduccionVentaIntegradas -- Time elapsed: 0.980 s <<< ERROR!
+java.lang.IllegalStateException: No se puede aprobar: registra y verifica el pago completo del pedido primero. Pagado: 0 de 45.00
+	at pe.edu.upeu.bomerp.ventas.service.PedidoService.aprobar(PedidoService.java:140)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:158)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719)
+	at pe.edu.upeu.bomerp.ventas.service.PedidoService$$SpringCGLIB$$0.aprobar(<generated>)
+	at pe.edu.upeu.bomerp.IntegracionTest.compraProduccionVentaIntegradas(IntegracionTest.java:58)

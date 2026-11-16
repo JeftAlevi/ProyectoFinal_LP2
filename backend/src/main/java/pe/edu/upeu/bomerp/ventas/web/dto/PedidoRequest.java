@@ -1,0 +1,36 @@
+package pe.edu.upeu.bomerp.ventas.web.dto;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
+public record PedidoRequest(
+        @NotNull @Positive Long clienteId,
+        @NotNull @Positive Long almacenId,
+        @NotEmpty List<@Valid Linea> detalles,
+        String tipoEntrega,
+        String vehiculo,
+        String formaPagoReal) {
+
+    public PedidoRequest(Long clienteId, Long almacenId, List<Linea> detalles) {
+        this(clienteId, almacenId, detalles, null, null, null);
+    }
+
+    public record Linea(
+            @NotBlank String codigoArticulo,
+            @NotNull @Positive BigDecimal cantidad,
+            @NotNull @DecimalMin("0") BigDecimal precio,
+            @NotNull @DecimalMin("0") @DecimalMax("100") BigDecimal descuento,
+            Long almacenId) {
+        public Linea(String codigoArticulo, BigDecimal cantidad, BigDecimal precio, BigDecimal descuento) {
+            this(codigoArticulo, cantidad, precio, descuento, null);
+        }
+    }
+}

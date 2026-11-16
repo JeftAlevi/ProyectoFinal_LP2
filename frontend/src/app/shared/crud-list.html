@@ -1,0 +1,62 @@
+<div class="page-title">
+  <div>
+    <span class="eyebrow">CATÁLOGOS</span>
+    <h1>{{ config.title }}</h1>
+  </div>
+  @if (auth.puede(config.modulo)) {
+    <a class="button primary" [routerLink]="['/catalogos', tipo, 'nuevo']">Nuevo registro</a>
+  }
+</div>
+<div class="tabs">
+  <a routerLink="/catalogos/articulos">Artículos</a
+  ><a routerLink="/catalogos/categorias">Categorías</a
+  ><a routerLink="/catalogos/unidades">Unidades</a
+  ><a routerLink="/administracion">Administración</a>
+</div>
+@if (error()) {
+  <p class="alert error">{{ error() }}</p>
+}
+<section class="card">
+  <input aria-label="Buscar" placeholder="Buscar…" [(ngModel)]="busqueda" />
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          @for (c of config.fields; track c.key) {
+            <th>{{ c.label }}</th>
+          }
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of filtrar(); track r.id) {
+          <tr>
+            <td>{{ r.id }}</td>
+            @for (c of config.fields; track c.key) {
+              <td>{{ valor(r, c) }}</td>
+            }
+            <td>
+              <a [routerLink]="['/catalogos', tipo, r.id, 'editar']">Editar</a>
+              <button class="danger-link" (click)="pendiente.set(r)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="10">{{ cargando() ? "Cargando…" : "No hay registros." }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+@if (pendiente(); as r) {
+  <div class="card">
+    <p>
+      ¿Eliminar el registro #{{ r.id }}? Si tiene relaciones activas, el sistema impedirá la
+      eliminación.
+    </p>
+    <button (click)="pendiente.set(null)">Cancelar</button
+    ><button class="danger" (click)="eliminar(r.id)">Confirmar eliminación</button>
+  </div>
+}

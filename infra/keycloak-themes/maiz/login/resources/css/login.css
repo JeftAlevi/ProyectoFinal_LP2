@@ -1,0 +1,215 @@
+/*
+ * Tema "maiz" para el login de Keycloak (sobre keycloak.v2 / PatternFly 5).
+ * Solo cambia la apariencia: el formulario, la validación y el flujo PKCE son los de Keycloak.
+ * La animación de fondo y el saludo los agrega js/acceso.js.
+ */
+:root {
+  --maiz-forest: #173f31;
+  --maiz-forest-2: #245840;
+  --maiz-gold: #d4aa4d;
+  --maiz-cream: #f3ead2;
+  --maiz-text: #eef5ee;
+  --maiz-soft: #cfe3d2;
+  --maiz-muted: #b8cbbd;
+}
+
+* { box-sizing: border-box; }
+
+/* ----- Fondo de la página ----- */
+html.login-pf,
+html.login-pf body,
+#keycloak-bg {
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  color: var(--maiz-text) !important;
+  font-family: "Segoe UI", system-ui, sans-serif !important;
+  background:
+    radial-gradient(1200px 700px at 15% 20%, #2d6a4a 0%, transparent 60%),
+    radial-gradient(900px 600px at 85% 85%, #3c5a1f 0%, transparent 55%),
+    linear-gradient(160deg, #0f2c22 0%, #173f31 45%, #0c241b 100%) !important;
+  background-attachment: fixed !important;
+}
+
+/* Elementos decorativos que inserta acceso.js */
+.maiz-blob {
+  position: fixed; border-radius: 50%; filter: blur(70px); pointer-events: none; z-index: 0;
+  animation: maiz-flotar 14s ease-in-out infinite alternate;
+}
+.maiz-blob.b1 { width: 420px; height: 420px; background: var(--maiz-gold); left: -120px; top: -80px; opacity: .22; }
+.maiz-blob.b2 { width: 360px; height: 360px; background: #7fb069; right: 8%; bottom: -120px; opacity: .25; animation-delay: -5s; }
+@keyframes maiz-flotar { to { transform: translate(60px, 40px) scale(1.1); } }
+#maiz-fondo { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+.maiz-lema {
+  position: fixed; z-index: 1; left: 6vw; bottom: 9vh; pointer-events: none;
+}
+.maiz-lema small { color: var(--maiz-gold); letter-spacing: .2em; font-size: 12px; font-weight: 600; }
+.maiz-lema h2 { margin: 8px 0 0; font-size: 30px; line-height: 1.1; font-weight: 600; color: var(--maiz-text); }
+
+.maiz-etapa {
+  position: fixed; z-index: 1; width: 300px; text-align: center; pointer-events: none; transition: opacity .5s;
+}
+.maiz-etapa small { display: block; color: var(--maiz-gold); letter-spacing: .2em; font-size: 11px; font-weight: 600; }
+.maiz-etapa strong { font-size: 17px; font-weight: 600; color: var(--maiz-text); }
+.maiz-puntos { display: flex; gap: 7px; justify-content: center; margin-top: 8px; }
+.maiz-puntos i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .25); transition: all .4s; }
+.maiz-puntos i.on { width: 20px; border-radius: 4px; background: var(--maiz-gold); }
+
+.maiz-pie {
+  position: fixed; z-index: 1; left: 0; right: 0; bottom: 16px; text-align: center;
+  font-size: 12px; color: #9db3a2; pointer-events: none;
+}
+
+/* ----- Distribución: marca arriba a la izquierda, tarjeta a la derecha ----- */
+.pf-v5-c-login {
+  position: relative; z-index: 2; min-height: 100vh; padding: 0 !important;
+  background: transparent !important;
+}
+.pf-v5-c-login__container {
+  min-height: 100vh; max-width: none !important; width: 100%;
+  display: grid !important; grid-template-columns: 1.1fr .9fr; align-items: center;
+  padding: 90px 6vw 60px !important; margin: 0 !important;
+}
+
+/* Marca "M  MAÍZ / ERP" (es el encabezado de Keycloak) */
+#kc-header {
+  position: fixed; top: 28px; left: 6vw; z-index: 3; margin: 0 !important; padding: 0 !important;
+}
+#kc-header-wrapper {
+  display: flex; align-items: center; gap: 10px; margin: 0;
+  color: var(--maiz-text) !important; font-size: 15px !important; font-weight: 700 !important;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+#kc-header-wrapper:before {
+  content: "M"; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px;
+  background: var(--maiz-gold); color: var(--maiz-forest); font-size: 18px; letter-spacing: 0;
+}
+
+/* ----- Tarjeta de vidrio esmerilado ----- */
+.pf-v5-c-login__main {
+  position: relative;
+  grid-column: 2; justify-self: center; width: min(400px, 100%) !important; max-width: 400px !important;
+  margin: 0 !important; padding: 30px !important; border-radius: 22px !important;
+  background: rgba(255, 255, 255, .09) !important;
+  border: 1px solid rgba(255, 255, 255, .18) !important;
+  backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .35) !important;
+  color: var(--maiz-text) !important;
+}
+.pf-v5-c-login__main-header {
+  display: flex !important; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+  gap: 8px; padding: 0 !important; margin-bottom: 18px;
+}
+.pf-v5-c-login__main-body,
+.pf-v5-c-login__main-footer { padding: 0 !important; }
+
+/* Saludo que inserta acceso.js ("BUENAS TARDES") */
+.maiz-saludo {
+  flex-basis: 100%; order: -1; display: flex; align-items: center; gap: 6px;
+  font-size: 11px; letter-spacing: .18em; color: var(--maiz-soft); font-weight: 600;
+}
+.maiz-saludo i { width: 7px; height: 7px; border-radius: 50%; background: var(--maiz-gold); display: inline-block; }
+
+#kc-page-title {
+  flex: 1 1 100%; margin: 6px 0 0 !important; color: var(--maiz-text) !important;
+  font-size: 26px !important; font-weight: 700 !important; line-height: 1.2; letter-spacing: -.3px;
+}
+#kc-page-title:after {
+  content: "Usa la cuenta asignada por el administrador para ingresar al sistema.";
+  display: block; margin-top: 8px; font-size: 13px; font-weight: 400; line-height: 1.5;
+  letter-spacing: 0; color: #c9d8cc;
+}
+
+/* Selector de idioma, pequeño, en la esquina de la tarjeta (no le quita espacio al título) */
+.pf-v5-c-login__main-header-utilities { position: absolute; top: 22px; right: 22px; margin: 0 !important; }
+.pf-v5-c-login__main-header-utilities .pf-v5-c-form-control {
+  min-height: 0 !important; padding: 0 !important; width: auto !important;
+  background: rgba(255, 255, 255, .08) !important; border-radius: 8px !important;
+}
+#login-select-toggle {
+  padding: 5px 26px 5px 10px !important; font-size: 12px !important;
+  background: transparent !important; color: var(--maiz-soft) !important; border: 0 !important;
+}
+#login-select-toggle option { color: #18251f; }
+
+/* ----- Campos ----- */
+.pf-v5-c-form__group { margin-bottom: 14px !important; }
+.pf-v5-c-form__label,
+.pf-v5-c-form__label-text {
+  color: var(--maiz-soft) !important; font-size: 11px !important; font-weight: 600 !important;
+  letter-spacing: .14em; text-transform: uppercase;
+}
+.pf-v5-c-login__main-body .pf-v5-c-form-control {
+  --pf-v5-c-form-control--after--BorderBottomColor: transparent;
+  --pf-v5-c-form-control--hover--after--BorderBottomColor: transparent;
+  --pf-v5-c-form-control--focus--after--BorderBottomColor: transparent;
+  border-radius: 12px !important; background: rgba(255, 255, 255, .08) !important;
+  border: 1px solid rgba(255, 255, 255, .16) !important; transition: border-color .18s, box-shadow .18s;
+}
+.pf-v5-c-login__main-body .pf-v5-c-form-control::before,
+.pf-v5-c-login__main-body .pf-v5-c-form-control::after { border: 0 !important; }
+.pf-v5-c-login__main-body .pf-v5-c-form-control > input {
+  min-height: 44px; padding: 11px 14px !important; background: transparent !important;
+  color: var(--maiz-text) !important; font-size: 14px !important; border: 0 !important; outline: none !important;
+}
+.pf-v5-c-login__main-body .pf-v5-c-form-control:focus-within {
+  border-color: var(--maiz-gold) !important; box-shadow: 0 0 0 3px rgba(212, 170, 77, .25);
+}
+.pf-v5-c-login__main-body .pf-v5-c-form-control.pf-m-error { border-color: #f0a08a !important; }
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--maiz-text) !important;
+  -webkit-box-shadow: 0 0 0 1000px #23503d inset !important; caret-color: var(--maiz-text);
+}
+
+/* Botón de "mostrar contraseña" */
+.pf-v5-c-input-group .pf-v5-c-button.pf-m-control {
+  border-radius: 12px !important; margin-left: 6px; color: var(--maiz-soft) !important;
+  background: rgba(255, 255, 255, .08) !important; border: 1px solid rgba(255, 255, 255, .16) !important;
+}
+.pf-v5-c-input-group .pf-v5-c-button.pf-m-control::after { border: 0 !important; }
+
+/* Mensajes de error de los campos */
+.pf-v5-c-helper-text__item-text.pf-m-error,
+.kc-feedback-text { color: #ffc4b4 !important; }
+
+/* Aviso general (por ejemplo "usuario o contraseña inválidos") */
+.pf-v5-c-alert {
+  margin-bottom: 16px; border-radius: 12px !important; border: 1px solid rgba(255, 255, 255, .18) !important;
+  background: rgba(255, 255, 255, .1) !important; color: var(--maiz-text) !important; box-shadow: none !important;
+}
+.pf-v5-c-alert.pf-m-danger { border-color: rgba(255, 160, 140, .55) !important; background: rgba(160, 40, 30, .25) !important; }
+.pf-v5-c-alert__title { color: var(--maiz-text) !important; }
+
+/* ----- Botón principal ----- */
+#kc-login { margin-top: 8px; }
+#kc-login, .pf-v5-c-login__main .pf-v5-c-button.pf-m-primary {
+  width: 100%; min-height: 48px; padding: 13px !important; border: 0 !important; border-radius: 12px !important;
+  background: var(--maiz-cream) !important; color: var(--maiz-forest) !important;
+  font-size: 15px !important; font-weight: 700 !important; cursor: pointer; transition: transform .15s, background .15s;
+}
+#kc-login:hover, .pf-v5-c-login__main .pf-v5-c-button.pf-m-primary:hover { background: #fff7e2 !important; transform: translateY(-1px); }
+#kc-login:focus-visible { outline: 3px solid var(--maiz-gold) !important; outline-offset: 2px; }
+
+/* Nota debajo del botón */
+#kc-form-login::after {
+  content: "✓  Los módulos que verás dependen de los permisos de tu usuario.";
+  display: block; margin-top: 16px; font-size: 12px; color: var(--maiz-muted); line-height: 1.5;
+}
+
+a, .pf-v5-c-login__main a { color: var(--maiz-cream) !important; }
+.pf-v5-c-login__main-footer-band { color: var(--maiz-muted) !important; border: 0 !important; }
+
+/* ----- Pantallas angostas: solo la tarjeta, centrada ----- */
+@media (max-width: 800px) {
+  .pf-v5-c-login__container { grid-template-columns: 1fr; padding: 92px 18px 56px !important; }
+  .pf-v5-c-login__main { grid-column: 1; }
+  .maiz-lema { display: none; }
+  #kc-header { left: 18px; top: 22px; }
+}
+
+/* Quien pide menos movimiento ve el fondo quieto */
+@media (prefers-reduced-motion: reduce) {
+  .maiz-blob { animation: none; }
+  *, *::before, *::after { transition-duration: .01ms !important; }
+}

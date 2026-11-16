@@ -1,0 +1,10 @@
+**/target/
+**/node_modules/
+**/.angular/
+**/dist/
+.env
+/backend/application-local.yml
+
+# Ajustes personales del editor y del asistente
+.vscode/
+.claude/

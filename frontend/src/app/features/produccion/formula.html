@@ -1,0 +1,12 @@
+<a routerLink="/produccion">← Producción</a><h1>Nueva fórmula</h1>
+<p>Selecciona un producto y agrega los insumos necesarios por cada unidad producida. Por ejemplo: 0.6 KG de maíz y 0.4 KG de soya; para producir 100 unidades se necesitarán 60 KG y 40 KG.</p>
+<p>Un mismo insumo puede usarse en varias fórmulas. Dentro de esta fórmula agrúpalo en una sola línea.</p>
+@if(error()){<p class="alert error" role="alert">{{error()}}</p>}
+<form [formGroup]="form" (ngSubmit)="guardar()" class="card"><div class="form-grid">
+<label>Nombre<input formControlName="nombre" maxlength="150" placeholder="Ejemplo: Purina de engorde 60/40"></label>
+<label>Producto terminado<select formControlName="codigoProductoTerminado"><option value="">Seleccionar</option>@for(a of articulos();track a.id){@if(a.tipoArticulo==='PRODUCTO_TERMINADO'){<option [value]="a.codigo">{{a.nombre}}</option>}}</select></label></div>
+<h2>Detalle de insumos</h2><div formArrayName="detalles">@for(f of filas.controls;track f;let i=$index){<div [formGroupName]="i" class="line-row">
+<label>Insumo<select formControlName="codigoArticulo" (change)="unidad(i)"><option value="">Seleccionar</option>@for(a of articulos();track a.id){<option [value]="a.codigo">{{a.nombre}} ({{a.codigo}})</option>}</select></label>
+<label>Cantidad por unidad<input type="number" step="0.0001" min="0.0001" formControlName="cantidadPorUnidad"></label><label>Unidad<input formControlName="unidadMedida" readonly></label>
+<button type="button" [disabled]="ocupado() || filas.length===1" (click)="filas.removeAt(i)">Quitar</button></div>}</div>
+<div class="actions"><button type="button" [disabled]="ocupado()" (click)="agregar()">+ Agregar insumo</button><button class="primary" [disabled]="ocupado()">{{ocupado() ? 'Guardando…' : 'Guardar fórmula'}}</button></div></form>

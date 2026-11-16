@@ -1,0 +1,44 @@
+<div class="page-title"><div><span class="eyebrow">PLANTA</span><h1>Órdenes de producción</h1></div><a class="button" routerLink="/formulas/nueva">Crear fórmula</a></div>
+<ol class="pasos cuatro" aria-label="Pasos de una orden de producción">
+  <li><b>1. Planifica</b><span>Elige la fórmula, la cantidad y los almacenes. No descuenta stock.</span></li>
+  <li><b>2. Inicia</b><span>Si falta stock, la orden queda en espera hasta que llegue el insumo.</span></li>
+  <li><b>3. Registra</b><span>Consumos reales de cada insumo y los resultados: terminado, merma…</span></li>
+  <li><b>4. Cierra</b><span>El producto terminado ingresa a Inventario como un lote nuevo.</span></li>
+</ol>
+<p><a routerLink="/reportes">Ver reporte de consumo planificado y real →</a></p>
+@if(error()){<p class="alert error" role="alert">{{error()}}</p>}@if(estado()){<p class="alert success" role="status">{{estado()}}</p>}
+<section class="card"><h2>1. Planificar una orden</h2>
+  <form [formGroup]="form" (ngSubmit)="crear()" class="form-grid">
+    <label>Fórmula<select formControlName="formulaId"><option [ngValue]="null">Seleccionar</option>@for(f of formulas();track f.id){<option [ngValue]="f.id">{{f.nombre}}</option>}</select></label>
+    <label>Cantidad a producir<input type="number" step="0.0001" min="0.0001" formControlName="cantidadPlanificada"></label>
+    <label>Almacén de insumos<select formControlName="almacenOrigenId"><option [ngValue]="null">Seleccionar</option>@for(a of almacenes();track a.id){<option [ngValue]="a.id">{{a.nombre}}</option>}</select></label>
+    <label>Almacén de destino<select formControlName="almacenDestinoId"><option [ngValue]="null">Seleccionar</option>@for(a of almacenes();track a.id){<option [ngValue]="a.id">{{a.nombre}}</option>}</select></label>
+    <div class="full">@for(d of plan();track d.codigoArticulo){<p>{{nombre(d.codigoArticulo)}} ({{d.codigoArticulo}}): <strong>{{d.total}} {{d.unidadMedida}}</strong> necesarios.@if(form.value.almacenOrigenId){ Disponible: {{d.disponible}} {{d.unidadMedida}}.@if(d.disponible < d.total){ <strong>Falta stock para iniciar.</strong>}}</p>}</div>
+    <button class="primary" [disabled]="ocupado() || form.invalid">Planificar nueva orden</button>
+  </form>
+</section>
+<section class="card"><h2>2. Elegir la orden y continuar</h2><p>Si una orden está en espera, vuelve a iniciarla cuando se reciban los insumos. No necesitas planificar otra.</p>
+<table><thead><tr><th>Orden</th><th>Fórmula</th><th>Cantidad</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
+@for(o of ordenes();track o.id){<tr><td>#{{o.id}}</td><td>{{o.formula.nombre}}</td><td>{{o.cantidadPlanificada}}</td><td><span class="badge">{{o.estado}}</span></td><td>
+  <button (click)="abrir(o)">Detalle y registro</button>
+  @if(o.estado==='PLANIFICADA'||o.estado==='EN_ESPERA'){<button [disabled]="ocupado()" (click)="accion(o.id,'iniciar')">Iniciar</button>}
+  @if(o.estado==='PLANIFICADA'||o.estado==='EN_ESPERA'||(o.estado==='EN_PROCESO' && !o.consumos.length)){<button [disabled]="ocupado()" (click)="accion(o.id,'cancelar')">Cancelar orden</button>}
+  @if(o.estado==='EN_PROCESO'){<button [disabled]="ocupado()" (click)="accion(o.id,'cerrar')">Cerrar orden</button>}
+</td></tr>}@empty{<tr><td colspan="5">Aún no hay órdenes. Completa el formulario de planificación.</td></tr>}
+</tbody></table></section>
+@if(seleccion();as o){<section class="card"><h2>Orden #{{o.id}} · {{o.estado}}</h2><p class="alert">{{siguiente(o)}}</p>
+@if(o.estado==='EN_ESPERA' && auth.puede('INVENTARIO')){<a routerLink="/inventario">Ir a Inventario para revisar recepciones →</a>}
+<div class="split"><div><h3>3. Consumos reales</h3><p>Registrar un consumo descuenta inmediatamente el stock del almacén de insumos.</p>
+@for(c of o.consumos;track c.id){<p>{{nombre(c.codigoArticulo)}} · {{c.cantidadConsumida}} {{c.unidadMedida}}</p>}@empty{<p>Aún no hay consumos.</p>}
+@if(o.estado==='EN_PROCESO'){<form (ngSubmit)="guardarConsumo()"><label>Insumo<select name="insumo" [(ngModel)]="consumo.codigoArticulo" (ngModelChange)="unidadConsumo()">@for(d of o.formula.detalles;track d.id){<option [value]="d.codigoArticulo">{{nombre(d.codigoArticulo)}} ({{d.codigoArticulo}})</option>}</select></label>
+<p>Disponible: {{disponible(consumo.codigoArticulo,o.almacenOrigenId)}} {{consumo.unidadMedida}}</p>
+<label>Cantidad en {{consumo.unidadMedida}}<input name="cantidad" type="number" [(ngModel)]="consumo.cantidadConsumida" min="0.0001" step="0.0001" required></label><button [disabled]="ocupado() || !(consumo.cantidadConsumida > 0)" class="primary">Registrar consumo</button></form>}
+</div><div><h3>4. Resultados y cierre</h3><p>Registra el terminado y las mermas. El lote terminado se genera al cerrar la orden.</p>
+@for(r of o.resultados;track r.id){<p>{{r.tipo}}: {{nombre(r.codigoArticulo)}} · {{r.cantidad}} {{r.unidadMedida}} @if(r.loteGeneradoId){· Lote #{{r.loteGeneradoId}}}</p>}@empty{<p>Aún no hay resultados.</p>}
+@if(o.estado==='EN_PROCESO'){<form (ngSubmit)="guardarResultado()"><label>Tipo<select name="tipo" [(ngModel)]="resultado.tipo"><option>TERMINADO</option><option>SUBPRODUCTO</option><option>MERMA</option><option>DESPERDICIO</option><option>REPROCESO</option></select></label>
+<label>Artículo<select name="articulo" [(ngModel)]="resultado.codigoArticulo" (ngModelChange)="unidadResultado()">@for(a of articulos();track a.id){<option [value]="a.codigo">{{a.nombre}}</option>}</select></label>
+<label>Cantidad en {{resultado.unidadMedida}}<input name="cantidad" type="number" [(ngModel)]="resultado.cantidad" min="0.0001" step="0.0001" required></label><button [disabled]="ocupado() || !(resultado.cantidad > 0)" class="primary">Registrar resultado</button></form>}
+</div></div></section>}
+<section class="card"><h2>Fórmulas e insumos compartidos</h2><p>Una fórmula utiliza varios insumos. El mismo insumo puede participar en varias fórmulas, con una cantidad distinta en cada una.</p>
+@for(f of formulas();track f.id){<details><summary>{{f.nombre}} · {{f.detalles.length}} insumos</summary><p>Producto: {{nombre(f.codigoProductoTerminado)}}</p><ul>@for(d of f.detalles;track d.id){<li>{{nombre(d.codigoArticulo)}} ({{d.codigoArticulo}}): {{d.cantidadPorUnidad}} {{d.unidadMedida}} por unidad producida</li>}</ul></details>}@empty{<p>Crea una fórmula para empezar.</p>}
+</section>

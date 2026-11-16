@@ -1,0 +1,28 @@
+-- Extrae la estructura real (DDL) del esquema BOMERP creada por Hibernate.
+-- Se ejecuta dentro del contenedor de Oracle; deja el resultado en /tmp/esquema_oracle.sql
+SET LONG 2000000 LONGCHUNKSIZE 2000000 PAGESIZE 0 LINESIZE 32767
+SET TRIMSPOOL ON FEEDBACK OFF HEADING OFF ECHO OFF VERIFY OFF TERMOUT OFF
+BEGIN
+  DBMS_METADATA.SET_TRANSFORM_PARAM(DBMS_METADATA.SESSION_TRANSFORM, 'STORAGE', FALSE);
+  DBMS_METADATA.SET_TRANSFORM_PARAM(DBMS_METADATA.SESSION_TRANSFORM, 'SEGMENT_ATTRIBUTES', FALSE);
+  DBMS_METADATA.SET_TRANSFORM_PARAM(DBMS_METADATA.SESSION_TRANSFORM, 'SQLTERMINATOR', TRUE);
+  DBMS_METADATA.SET_TRANSFORM_PARAM(DBMS_METADATA.SESSION_TRANSFORM, 'PRETTY', TRUE);
+  DBMS_METADATA.SET_TRANSFORM_PARAM(DBMS_METADATA.SESSION_TRANSFORM, 'REF_CONSTRAINTS', FALSE);
+END;
+/
+SPOOL /tmp/esquema_oracle.sql
+PROMPT -- ===== TABLAS =====
+SELECT DBMS_METADATA.GET_DDL('TABLE', table_name) FROM user_tables ORDER BY table_name;
+PROMPT -- ===== LLAVES FORANEAS =====
+SELECT DBMS_METADATA.GET_DEPENDENT_DDL('REF_CONSTRAINT', table_name) FROM user_tables
+ WHERE table_name IN (SELECT table_name FROM user_constraints WHERE constraint_type = 'R') ORDER BY table_name;
+PROMPT -- ===== INDICES (no generados por PK/UK) =====
+SELECT DBMS_METADATA.GET_DDL('INDEX', index_name) FROM user_indexes
+ WHERE index_type <> 'LOB' AND index_name NOT IN (SELECT index_name FROM user_constraints WHERE index_name IS NOT NULL)
+ ORDER BY table_name, index_name;
+PROMPT -- ===== SECUENCIAS =====
+SELECT DBMS_METADATA.GET_DDL('SEQUENCE', sequence_name) FROM user_sequences WHERE sequence_name NOT LIKE 'ISEQ$$%' ORDER BY sequence_name;
+PROMPT -- ===== FILAS POR TABLA =====
+SELECT '-- ' || table_name || ': ' || TO_CHAR(NVL(num_rows, 0)) FROM user_tables ORDER BY table_name;
+SPOOL OFF
+EXIT
